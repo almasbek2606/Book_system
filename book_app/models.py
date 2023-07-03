@@ -32,7 +32,6 @@ class BookModel(models.Model):
     page = models.PositiveSmallIntegerField(default=1)
     price = models.PositiveIntegerField(default=1)
 
-
     def __str__(self):
         return self.name
 
