@@ -4,60 +4,56 @@ from rest_framework.views import APIView
 from .models import BookModel, AuthorModel
 from .serializers import BookSerializer, AuthorSerializer
 from rest_framework import status
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerPermission
 
 # Create your views here.
 
 """"""""""""""""""""""""""""""""""THIS IS BOOK API VIEW"""""""""""""""""""""""""""""""""
 
 
-class AllBookView(APIView):
-    def get(self, request, *args, **kwargs):
-        all_book = BookModel.objects.all()
-        serializer = BookSerializer(all_book, many=True)
-        return Response(serializer.data)
+class AllBookView(generics.ListAPIView):
+    queryset = BookModel.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = (IsAuthenticated, )
+
+# class AllBookView(APIView):
+#     def get(self, request, *args, **kwargs):
+#         all_book = BookModel.objects.all()
+#         serializer = BookSerializer(all_book, many=True)
+#         return Response(serializer.data)
 
 
-class DetailBookView(APIView):
-    def get(self, request, *args, **kwargs):
-        book = get_object_or_404(BookModel, pk=kwargs['book_id'])
-        serializer = BookSerializer(book)
-        return Response(serializer.data)
+class DetailBookView(generics.RetrieveAPIView):
+    queryset = BookModel.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = (IsOwnerPermission,)
 
 
-class CreateBookView(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = BookSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+class CreateBookView(generics.CreateAPIView):
+    queryset = BookModel.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = (IsOwnerPermission, )
 
+class UpdateBookView(generics.UpdateAPIView):
+    queryset = BookModel.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = (IsOwnerPermission, )
 
-class UpdateBookView(APIView):
-    def patch(self, request, *args, **kwargs):
-        instance = get_object_or_404(BookModel, pk=kwargs['book_id'])
-        serializer = BookSerializer(instance, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class DeleteBookView(APIView):
-    def delete(self, request, *args, **kwargs):
-        instance = get_object_or_404(BookModel, pk=kwargs['book_id'])
-        instance.delete()
-        return Response({'m': 'success'}, status=status.HTTP_204_NO_CONTENT)
+class DeleteBookView(generics.DestroyAPIView):
+    queryset = BookModel.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = (IsOwnerPermission, )
 
 
 """""""""""""""""""""""""""""""""""THIS IS AUTHOR API VIEW"""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
-class AllAuthorView(APIView):
-    def get(self, request, *args, **kwargs):
-        all_author = AuthorModel.objects.all()
-        auth_serializer = AuthorSerializer(all_author)
-        return Response(auth_serializer.data)
+class AllAuthorView(generics.ListAPIView):
+    queryset = AuthorModel.objects.all()
+    serializer_class = AuthorSerializer
+    permission_classes = (IsOwnerPermission, )
 
 
 class DetailAuthorView(APIView):
@@ -95,7 +91,6 @@ class DeleteAuthorView(APIView):
 class GetBookFromAuthorView(APIView):
     def get(self, request, *args, **kwargs):
         if get_object_or_404(AuthorModel, pk=kwargs['author_id']):
-            all_book = BookModel.objects.all()
+            all_book = BookModel.objects.filter()
             serializer = BookSerializer(all_book, many=True)
             return Response(serializer.data)
-
