@@ -15,6 +15,7 @@ importlib-metadata==6.8.0
 jeepney==0.8.0
 keyring==23.5.1
 Pillow==9.0.1
+psycopg2-binary==2.9.6
 pycparser==2.21
 PyJWT==2.7.0
 python-dotenv==1.0.0
